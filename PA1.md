@@ -8,6 +8,7 @@ Load the appropriate libraries.
 ```r
 library(dplyr)
 library(knitr)
+library(lattice)
 opts_chunk$set(echo = TRUE, results = "hide")
 ```
 
@@ -42,8 +43,7 @@ The histogram of the total number of steps taken each day (ignoring the missing 
 
 ```r
 # Summarize total number of steps for each day
-by_day <- group_by(data_obs, date)
-steps_day <- summarize(by_day, steps = sum(steps))
+steps_day <- data_obs %>% group_by(date) %>% summarize(steps = sum(steps))
 
 # Generate histogram
 hist(steps_day$steps, col="red", main="Steps per Day Histogram", xlab="Total number of steps per day")
@@ -68,12 +68,11 @@ This is a time-series plot of the average number of steps taken in each 5-minute
 
 ```r
 # Calculate the average number of steps for each 5-minute interval across all days
-by_interval <- group_by(data_obs, interval)
-steps_interval <- summarize(by_interval, steps = mean(steps))
+steps_interval <- data_obs %>% group_by(interval) %>% summarize(steps = mean(steps))
 
 # Generate line plot
 plot(steps_interval$interval, steps_interval$steps, type="l", main="Average Steps per 5-min Interval",
-     xlab="Interval (5-minute)", ylab="Number of Steps")
+     xlab="5 minute Interval (hhmm)", ylab="Number of Steps")
 ```
 
 ![](PA1_files/figure-html/step_3-1.png) 
@@ -81,8 +80,8 @@ plot(steps_interval$interval, steps_interval$steps, type="l", main="Average Step
 ```r
 #Find the interval with the maximum number of steps
 idx <- which.max(steps_interval$steps)
-max_steps = steps_interval[idx, "steps"]
-interval = steps_interval[idx, "interval"]
+max_steps <- steps_interval[idx, "steps"]
+interval  <- steps_interval[idx, "interval"]
 ```
 
 The 8.35 interval is the one with the maximum average number of steps (206.17).
@@ -98,23 +97,61 @@ Will impute the missing values with the average steps for the corresponding 5-mi
 
 
 ```r
-# Keep only the date and interval columns of the observations with NAs,
-# then add the average steps for the corresponding 5-min interval 
+# Keep only the date and interval columns of the observations with NA's,
+# then add a column with the average steps for the corresponding 5-min interval 
 data_imp <- data_na %>% select(date, interval) %>% left_join(steps_interval, by = "interval")
 
 # Bind the actual device readings and the imputed observations
 data_full <- bind_rows(data_obs, data_imp)
 
 # Summarize total number of steps for each day
-by_day <- group_by(data_full, date)
-steps_day <- summarize(by_day, steps = sum(steps))
+steps1_day <- data_full %>% group_by(date) %>% summarize(steps = sum(steps))
 
 # Generate histogram
-hist(steps_day$steps, col="green", main="Steps per Day Histogram", xlab="Total number of steps per day")
+hist(steps1_day$steps, col="green", main="Steps per Day Histogram (w/imputed data)", xlab="Total number of steps per day")
 ```
 
 ![](PA1_files/figure-html/step_4-1.png) 
 
+```r
+# New mean and median
+mean1_day <- mean(steps1_day$steps)
+median1_day <- median(steps1_day$steps)
+```
 
+Now we have observations for 61 days; initially we had observations for 53 days.
+
+The new mean number of steps per day is 10766.19, the new median is 10766.19;
+basically unchanged as expected since we imputed the average number of steps for each 5-min interval.
+
+*****
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+```r
+# Change Locale to obtain weekday names in English
+lct <- Sys.getlocale("LC_TIME")
+Sys.setlocale("LC_TIME", "C")
+
+# Create a data frame to map days to weekday or weekend factor
+day_map <- data_frame(day = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+                      weekday = factor(c("weekday", "weekday", "weekday", "weekday", "weekday", "weekend", "weekend")))
+
+# Add day and weekday columns to the observations
+data_day <- data_full %>% mutate(day = weekdays(as.Date(date), abbreviate=TRUE)) %>% left_join(day_map, by = "day")
+
+# Group observations by interval and weekday, calculate the mean number of steps
+steps_interval_wd <- data_day %>% group_by(interval, weekday) %>% summarize(steps = mean(steps))
+
+# Plot the results
+xyplot(steps ~ interval | weekday, data = steps_interval_wd, type="l", layout = c(1, 2), xlab="Interval", ylab="Average Steps")
+```
+
+![](PA1_files/figure-html/step_5-1.png) 
+
+```r
+# Restore Locale
+Sys.setlocale("LC_TIME", lct)
+```
