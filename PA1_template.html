@@ -90,7 +90,7 @@ rows_obs &lt;- nrow(data_obs)</code></pre>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level2">
 <h2>What is mean total number of steps taken per day?</h2>
-<p>The histogram of the total number of steps taken each day (ignoring the missing values in the dataset) is shown here:</p>
+<p>A histogram of the total number of steps taken each day (ignoring the missing values in the dataset) is shown here:</p>
 <pre class="r"><code># Summarize total number of steps for each day
 steps_day &lt;- data_obs %&gt;% group_by(date) %&gt;% summarize(steps = sum(steps))
 
@@ -147,12 +147,13 @@ histogram(~steps, data = stepsi_day, col=&quot;green&quot;,
 <pre class="r"><code># New mean and median
 meani_day &lt;- mean(stepsi_day$steps)
 mediani_day &lt;- median(stepsi_day$steps)</code></pre>
-<p>Now we have observations for 61 days; initially we had observations for 53 days.</p>
+<p>Now we have observations for 61 days; initially we had observations for only 53 days.</p>
 <p>The new mean number of steps per day is 10766.19, the new median is 10766.19; basically unchanged as expected since we imputed the average number of steps for each 5-min interval.</p>
 <hr />
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+<p>The graphs below depict the difference in activity patterns between weekdays and weekends.</p>
 <pre class="r"><code># Change Locale to obtain weekday names in English
 lct &lt;- Sys.getlocale(&quot;LC_TIME&quot;)
 Sys.setlocale(&quot;LC_TIME&quot;, &quot;C&quot;)
@@ -178,7 +179,7 @@ xyplot(steps ~ interval | weekday, data = steps_interval_wd, type=&quot;l&quot;,
 Sys.setlocale(&quot;LC_TIME&quot;, lct)</code></pre>
 <div id="end-of-report" class="section level3">
 <h3>End of report</h3>
-<p>Author: LLN<br />Date: May 16, 2015</p>
+<p>Author: LLN<br />Date: June 13, 2015</p>
 <hr />
 </div>
 </div>

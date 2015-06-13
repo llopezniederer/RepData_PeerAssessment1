@@ -43,7 +43,7 @@ The data set has `r cols` variables (columns) and `r rows_all` observations, out
 
 ## What is mean total number of steps taken per day?
 
-The histogram of the total number of steps taken each day (ignoring the missing values in the dataset) is shown here:
+A histogram of the total number of steps taken each day (ignoring the missing values in the dataset) is shown here:
 
 ```{r step_2}
 # Summarize total number of steps for each day
@@ -117,7 +117,7 @@ meani_day <- mean(stepsi_day$steps)
 mediani_day <- median(stepsi_day$steps)
 ```
 
-Now we have observations for `r sprintf("%d", nrow(stepsi_day))` days; initially we had observations for `r sprintf("%d", nrow(steps_day))` days.
+Now we have observations for `r sprintf("%d", nrow(stepsi_day))` days; initially we had observations for only `r sprintf("%d", nrow(steps_day))` days.
 
 The new mean number of steps per day is `r sprintf("%.2f", meani_day)`, the new median is `r sprintf("%.2f", mediani_day)`;
 basically unchanged as expected since we imputed the average number of steps for each 5-min interval.
@@ -126,6 +126,8 @@ basically unchanged as expected since we imputed the average number of steps for
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+
+The graphs below depict the difference in activity patterns between weekdays and weekends.
 
 ```{r step_5}
 # Change Locale to obtain weekday names in English
@@ -153,8 +155,9 @@ xyplot(steps ~ interval | weekday, data = steps_interval_wd, type="l",
 Sys.setlocale("LC_TIME", lct)
 ```
 
+
 ### End of report
 Author: LLN  
-Date: May 16, 2015  
+Date: June 13, 2015  
 
 *****
